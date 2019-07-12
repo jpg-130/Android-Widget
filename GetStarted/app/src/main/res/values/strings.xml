@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Quote</string>
+    <string name="appwidget_text">Be Motivated</string>
+    <string name="add_widget">Add widget</string>
+    <string name="Description">This is a simple app that fetches quotes from api and displays it in the app widget.
+        \n
+        The app does not have any such internal view or functionality yet but focuses only on the widget which updates in every 24 hours.
+        \n
+        Any changes and suggestions are welcome. However, it is in its very initial stage.</string>
+
+</resources>
