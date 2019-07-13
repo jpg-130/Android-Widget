@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,14 +23,12 @@ import java.util.Random;
  * Implementation of App Widget functionality.
  */
 public class Quote extends AppWidgetProvider {
+    static int i=0;
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
-
-        RetrieveFeedTask retrieveFeedTask = new RetrieveFeedTask(context,appWidgetManager, appWidgetId );
-        Log.i("TAGGER", AppWidgetManager.EXTRA_APPWIDGET_ID);
-        AsyncTask<Void, Void, String> lala=retrieveFeedTask.execute();
+    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+        Log.i("TAG","updateAppWidget");
         CharSequence widgetText = context.getString(R.string.appwidget_text);
+        Log.i("TAG",context.getString(R.string.appwidget_text));
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.quote);
         views.setTextViewText(R.id.appwidget_text, widgetText);
         // Instruct the widget manager to update the widget
@@ -41,9 +38,14 @@ public class Quote extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        Log.i("TAG","onUpdate");
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
+            Log.i("TAG",""+appWidgetId);
+            RetrieveFeedTask retrieveFeedTask = new RetrieveFeedTask(context,appWidgetManager, appWidgetId );
+            retrieveFeedTask.execute();
             updateAppWidget(context, appWidgetManager, appWidgetId);
+//            appWidgetManager.updateAppWidget(appWidgetId, views);
 
         }
     }
@@ -58,32 +60,32 @@ public class Quote extends AppWidgetProvider {
         Random random = new Random();
         String rurl = "https://www.forbes.com/forbesapi/thought/uri.json?enrich=true&query="+(random.nextInt(10000));
 //        String rurl = "https://www.forbes.com/quotes/?";
-        public RetrieveFeedTask(Context con, AppWidgetManager apm,
-                                int widgetid){
+        private RetrieveFeedTask(Context con, AppWidgetManager apm, int widgetid){
             appWidgetId = widgetid;
             appWidgetManager = apm;
             context = con;
-            Log.i("TAG", Integer.toString(appWidgetId));
+//            Log.i("TAG", Integer.toString(appWidgetId));
         }
         @Override
         protected String doInBackground(Void... voids) {
+            Log.i("TAG","doInBackground");
             try {
                 URL url = new URL(rurl);
                 HttpURLConnection myConnection = (HttpURLConnection) url.openConnection();
                 myConnection.setRequestMethod("GET");
                 if (myConnection.getResponseCode()==200) {
-                    Log.i("TAG", "This Works"+myConnection.getResponseMessage());
+//                    Log.i("TAG", "This Works"+myConnection.getResponseMessage());
 //                    resultString = (String) url.getContent();
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(myConnection.getInputStream()));
                     resultString = bufferedReader.readLine();
-                    Log.i("TAG", resultString);
+//                    Log.i("TAG", resultString);
                     try {
                         JSONObject jsonObject = new JSONObject(resultString);
-                        Log.i("TAG", "Test "+jsonObject.toString());
+//                        Log.i("TAG", "Test "+jsonObject.toString());
 //                        resultString = jsonObject.toString();
                         JSONObject thought = jsonObject.getJSONObject("thought");
                         resultString = thought.getString("quote");
-                        Log.i("TAGs", "Actual Output "+ resultString);
+//                        Log.i("TAGs", "Actual Output "+ resultString);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -91,6 +93,7 @@ public class Quote extends AppWidgetProvider {
 
                 } else {
                     Log.i("TAG", "Oh Snap! Does not connect."+myConnection.getResponseMessage());
+                    resultString = "Connection Error";
                 }
             } catch (MalformedURLException e) {
                 return e.getMessage();
@@ -106,6 +109,7 @@ public class Quote extends AppWidgetProvider {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            Log.i("TAG","onPostExecute");
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.quote);
             views.setTextViewText(R.id.appwidget_text, resultString);
             appWidgetManager.updateAppWidget(appWidgetId, views);
