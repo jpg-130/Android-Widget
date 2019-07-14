@@ -1,5 +1,5 @@
 # Android-Widget
-Simple Widget That Displays Quotes
+Simple Widget That Displays Quotes fetched from api.
 
 
 | Widget on home screen | Widget option |
