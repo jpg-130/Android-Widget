@@ -3,6 +3,7 @@ package com.example.getstarted;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -23,7 +25,8 @@ import java.util.Random;
  * Implementation of App Widget functionality.
  */
 public class Quote extends AppWidgetProvider {
-    static int i=0;
+//    static int i=0;
+    AssetManager assetManager;
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         Log.i("TAG","updateAppWidget");
@@ -51,13 +54,14 @@ public class Quote extends AppWidgetProvider {
     }
 
 
-    static class RetrieveFeedTask extends AsyncTask<Void, Void, String> {
-//        String rurl = "http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
+    static class RetrieveFeedTask extends AsyncTask<Void, Void, String> { ;
         String resultString = "BE PATIENT";
         int appWidgetId;
         Context context;
+        QuoteReaderWriter quoteReaderWriter;
         AppWidgetManager appWidgetManager;
         Random random = new Random();
+        AssetManager assetManager;
         String rurl = "https://www.forbes.com/forbesapi/thought/uri.json?enrich=true&query="+(random.nextInt(10000));
 //        String rurl = "https://www.forbes.com/quotes/?";
         private RetrieveFeedTask(Context con, AppWidgetManager apm, int widgetid){
@@ -65,6 +69,7 @@ public class Quote extends AppWidgetProvider {
             appWidgetManager = apm;
             context = con;
 //            Log.i("TAG", Integer.toString(appWidgetId));
+            quoteReaderWriter = new QuoteReaderWriter(con);
         }
         @Override
         protected String doInBackground(Void... voids) {
@@ -86,7 +91,11 @@ public class Quote extends AppWidgetProvider {
                         JSONObject thought = jsonObject.getJSONObject("thought");
                         resultString = thought.getString("quote");
 //                        Log.i("TAGs", "Actual Output "+ resultString);
-
+                        quoteReaderWriter.insertQuoteInDb(resultString);
+                        resultString=quoteReaderWriter.fetchQuote();
+                        if(resultString==null){
+                            resultString="BE PATIENT";
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
