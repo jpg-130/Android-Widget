@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class QuoteReaderWriter extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
@@ -37,8 +38,10 @@ public class QuoteReaderWriter extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_VAL, newQuote );
         long success = db.insert(TABLE_NAME, null, contentValues);
-        if(success!=-1)
+        if(success!=-1) {
+            Log.i("TAG INSERT",newQuote);
             return true;
+        }
         return false;
     }
 
@@ -56,6 +59,7 @@ public class QuoteReaderWriter extends SQLiteOpenHelper {
                 //Delete Fetched quote
                 db.delete(TABLE_NAME, COLUMN_ID+" = "+arrData[0], null);
                 //returning fetched quote
+                Log.i("TAG Delete",arrData[1]);
                 return arrData[1];
             }
             cursor.close();

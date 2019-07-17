@@ -7,13 +7,10 @@ import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.RemoteViews;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -25,8 +22,6 @@ import java.util.Random;
  * Implementation of App Widget functionality.
  */
 public class Quote extends AppWidgetProvider {
-//    static int i=0;
-    AssetManager assetManager;
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         Log.i("TAG","updateAppWidget");
@@ -55,13 +50,12 @@ public class Quote extends AppWidgetProvider {
 
 
     static class RetrieveFeedTask extends AsyncTask<Void, Void, String> { ;
-        String resultString = "BE PATIENT";
+        String resultString = null;
         int appWidgetId;
         Context context;
         QuoteReaderWriter quoteReaderWriter;
         AppWidgetManager appWidgetManager;
         Random random = new Random();
-        AssetManager assetManager;
         String rurl = "https://www.forbes.com/forbesapi/thought/uri.json?enrich=true&query="+(random.nextInt(10000));
 //        String rurl = "https://www.forbes.com/quotes/?";
         private RetrieveFeedTask(Context con, AppWidgetManager apm, int widgetid){
@@ -90,11 +84,10 @@ public class Quote extends AppWidgetProvider {
 //                        resultString = jsonObject.toString();
                         JSONObject thought = jsonObject.getJSONObject("thought");
                         resultString = thought.getString("quote");
-//                        Log.i("TAGs", "Actual Output "+ resultString);
+                        Log.i("TAGs", "Actual Output "+ resultString);
                         quoteReaderWriter.insertQuoteInDb(resultString);
-                        resultString=quoteReaderWriter.fetchQuote();
                         if(resultString==null){
-                            resultString="BE PATIENT";
+                            resultString=quoteReaderWriter.fetchQuote();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -102,13 +95,15 @@ public class Quote extends AppWidgetProvider {
 
                 } else {
                     Log.i("TAG", "Oh Snap! Does not connect."+myConnection.getResponseMessage());
-                    resultString = "Connection Error";
+//                    resultString = "Connection Error";
+                    resultString=quoteReaderWriter.fetchQuote();
                 }
             } catch (MalformedURLException e) {
                 return e.getMessage();
             } catch (IOException e) {
                 return e.getMessage();
             }
+
             return resultString;
 //        TODO: Add API address etc and return data from it in below return statement
 //        TODO: API https://www.forbes.com/forbesapi/thought/uri.json?enrich=true&query=1&relatedlimit=1
@@ -117,7 +112,7 @@ public class Quote extends AppWidgetProvider {
 
         @Override
         protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+//            super.onPostExecute(s);
             Log.i("TAG","onPostExecute");
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.quote);
             views.setTextViewText(R.id.appwidget_text, resultString);
