@@ -1,6 +1,6 @@
 # Android-Widget
 Simple Widget That Displays Quotes fetched from api.
-
+It also contains a database from which queries can be retrieved when offline.
 
 | Widget on home screen | Widget option |
 |----|----|
