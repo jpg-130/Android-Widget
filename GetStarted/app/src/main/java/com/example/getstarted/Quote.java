@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.os.Debug;
 import android.util.Log;
 import android.widget.RemoteViews;
 import org.json.JSONException;
@@ -15,6 +16,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -24,6 +28,14 @@ import java.util.Random;
 public class Quote extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+        // Uses the <code><a href="/reference/java/text/SimpleDateFormat.html">SimpleDateFormat</a></code> class to create a String with
+        // the current date and time.
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat("dd_MM_yyyy_hh_mm_ss", Locale.getDefault());
+        String logDate = dateFormat.format(new Date());
+        // Applies the date and time to the name of the trace log.
+        Debug.startMethodTracing(
+                "sample-" + logDate);
         Log.i("TAG","updateAppWidget");
         CharSequence widgetText = context.getString(R.string.appwidget_text);
         Log.i("TAG",context.getString(R.string.appwidget_text));
@@ -117,6 +129,7 @@ public class Quote extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.quote);
             views.setTextViewText(R.id.appwidget_text, resultString);
             appWidgetManager.updateAppWidget(appWidgetId, views);
+            Debug.stopMethodTracing();
 
         }
     }
